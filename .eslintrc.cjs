@@ -25,7 +25,10 @@ module.exports = {
       "warn",
       { allowConstantExport: true },
     ],
+    "react-hooks/exhaustive-deps": "warn",
     "react/no-children-prop": ["off"],
+    "no-unreachable": ["warn"],
+    complexity: ["warn", 10],
   },
   settings: {
     react: {

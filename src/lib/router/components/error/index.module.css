@@ -1,0 +1,7 @@
+.container {
+  @extend .center;
+
+  > p {
+    color: red;
+  }
+}

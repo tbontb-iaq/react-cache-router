@@ -1,8 +1,8 @@
-import pExtend from "postcss-extend";
-import pNest from "postcss-nesting";
 import react from "@vitejs/plugin-react-swc";
 import { fileURLToPath } from "node:url";
-import { defineConfig, createFilter, Plugin } from "vite";
+import pExtend from "postcss-extend";
+import pNest from "postcss-nesting";
+import { Plugin, createFilter, defineConfig } from "vite";
 
 const basePath = fileURLToPath(new URL("./src", import.meta.url));
 
@@ -35,13 +35,13 @@ export default defineConfig({
 
 function additionalData(dataMap: Record<string, string[]>): Plugin {
   const filters = Object.entries(dataMap).map<
-    [(id: unknown) => boolean, string[]]
-  >(([p, d]) => [createFilter(p), [...d, ""]]);
+    [(id: unknown) => boolean, string]
+  >(([p, d]) => [createFilter(p), [...d, ""].join("\n")]);
 
   return {
-    name: "vite-plugin-addition-data",
+    name: "vite-plugin-additional-data",
     enforce: "pre",
     transform: (code, id) =>
-      filters.reduce((c, [f, d]) => (f(id) ? d.join("\n") : "") + c, code),
+      filters.reduce((c, [f, s]) => (f(id) ? s : "") + c, code),
   };
 }

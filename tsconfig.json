@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ESNext",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
 
@@ -26,8 +26,9 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "downlevelIteration": true,
-    "importHelpers": true
+    "importHelpers": true,
+    "noUncheckedIndexedAccess": true
   },
-  "include": ["src", "vite.config.ts"],
+  "include": ["src", "vite.config.ts", "prettier.config.mjs"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
