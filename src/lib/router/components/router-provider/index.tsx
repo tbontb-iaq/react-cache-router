@@ -12,6 +12,8 @@ import _ from "lodash";
 import { ReactNode, useEffect, useMemo, useState } from "react";
 
 const getPathname = () => location.pathname.slice(1);
+const routerError = (path: string) =>
+  new Error(`Could not resolve path '${path}'`);
 
 function RouterProvider({
   router,
@@ -30,21 +32,29 @@ function RouterProvider({
     const last = _.last(p);
 
     if (last === undefined)
-      pages[0] = {
+      pages.push({
         path,
         router,
-        error: new Error(`Could not resolve path '${path}'`),
-      };
+        error: routerError(path),
+      });
     else {
       pages.push(last);
       if (rest) {
         try {
-          pages.push(...resolveRouter(last.router, "children", rest).pages);
+          const resolved = resolveRouter(last.router, "children", rest);
+          pages.push(...resolved.pages);
+          if (resolved.rest) {
+            pages.push({
+              path: resolved.rest,
+              router: _.last(resolved.pages)!.router,
+              error: routerError(resolved.rest),
+            });
+          }
         } catch (error) {
           pages.push({
             path: rest,
             router: last.router,
-            error: new Error(`Could not resolve path '${rest}'`),
+            error: routerError(rest),
           });
         }
       }
@@ -62,7 +72,10 @@ function RouterProvider({
   );
 
   useEffect(() => {
-    const listener = () => setPath(getPathname());
+    const listener = () => {
+      setPath(getPathname());
+      console.log("set path: ", getPathname());
+    };
     addEventListener(NAV_EVENT, listener);
     return () => removeEventListener(NAV_EVENT, listener);
   }, []);
@@ -71,7 +84,7 @@ function RouterProvider({
     const paths = pages.slice(1).map((v) => v.path);
     navigation.paths = paths;
 
-    const url = navigation.resolve("/" + paths.join("/"));
+    const url = navigation.resolve("./" + paths.join("/"));
     if (url?.pathname !== location.pathname)
       navigation.navTo(url, { method: "replace" });
   }, [navigation, pages]);

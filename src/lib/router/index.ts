@@ -5,8 +5,8 @@ export {} from "./components/router-cache";
 export { RouterProvider } from "./components/router-provider";
 export { RouterView } from "./components/router-view";
 
-export {} from "./context/cache";
-export {} from "./context/navigation";
+export { usePath } from "./context/cache";
+export { useNavigation } from "./context/navigation";
 export {} from "./context/router";
 
 export { createRouter } from "./utils/createRouter";

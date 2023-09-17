@@ -4,7 +4,6 @@ import { Router } from "../types";
 function resolvePath(
   pathname: string,
   entries: [string, Router][],
-  end: boolean,
 ): { path?: string; rest: string; router?: Router } {
   if (pathname.startsWith("/"))
     return {
@@ -21,9 +20,9 @@ function resolvePath(
 
   const [path, router] =
     entries.find(([, v]) => v.default) ??
-    (end ? entries.find(([p]) => p === "") : undefined) ??
+    (pathname.length === 0 ? entries.find(([p]) => p === "") : undefined) ??
     [];
-  return { path, router, rest: router ? "" : pathname };
+  return { path, router, rest: pathname.slice(path ? path.length + 1 : 0) };
 }
 
 /*eslint complexity: ['warn', 15] */
@@ -32,7 +31,6 @@ function resolveRouter(
   property: "router" | "children",
   pathname: string,
   path: string | undefined = undefined,
-  end = false,
 ): { pages: Page[]; rest?: string } {
   const pages: Page[] = [];
   const record = router[property];
@@ -40,7 +38,7 @@ function resolveRouter(
     path: new_path,
     rest,
     router: new_router,
-  } = resolvePath(pathname, Object.entries(record ?? {}), end);
+  } = resolvePath(pathname, Object.entries(record ?? {}));
   if (new_router === undefined)
     if (property === "router") return { pages, rest };
     else throw new Error(`Could not resolve ${pathname}`);
@@ -49,14 +47,12 @@ function resolveRouter(
   path = ((path && path + "/") ?? "") + (new_path ?? "");
 
   if (not_empty) pages.push({ path: path, router: new_router });
-  const new_end = end || new_path === pathname || new_path + "/" === pathname;
   if (rest.length || !not_empty) {
     const { pages: rt, rest: rs } = resolveRouter(
       new_router,
       property,
       rest,
       not_empty ? undefined : path,
-      new_end,
     );
     return { pages: [...pages, ...rt], rest: rs };
   }
