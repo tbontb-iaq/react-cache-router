@@ -1,7 +1,8 @@
 import react from "@vitejs/plugin-react-swc";
 import { fileURLToPath } from "node:url";
+import pComment from "postcss-comment";
 import pExtend from "postcss-extend";
-import pNest from "postcss-nesting";
+import pNest from "postcss-nested";
 import { Plugin, createFilter, defineConfig } from "vite";
 
 const basePath = fileURLToPath(new URL("./src", import.meta.url));
@@ -24,6 +25,8 @@ export default defineConfig({
       localsConvention: "camelCaseOnly",
     },
     postcss: {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      parser: pComment,
       plugins: [
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         pExtend(),

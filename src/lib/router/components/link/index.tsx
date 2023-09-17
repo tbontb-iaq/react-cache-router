@@ -2,7 +2,12 @@ import { NavConfig, useNavigation } from "../../context/navigation";
 
 import { AnchorHTMLAttributes, MouseEventHandler, useCallback } from "react";
 
-interface LinkProps extends NavConfig, AnchorHTMLAttributes<HTMLAnchorElement> {
+interface LinkProps
+  extends NavConfig,
+    React.DetailedHTMLProps<
+      AnchorHTMLAttributes<HTMLAnchorElement>,
+      HTMLAnchorElement
+    > {
   default?: boolean;
   back?: boolean;
   forward?: boolean;

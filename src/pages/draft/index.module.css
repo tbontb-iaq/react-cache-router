@@ -1,3 +1,9 @@
 .container {
   @extend .center;
+
+  :global button.material-button {
+    .ripple {
+      /* animation-timing-function: steps(3); */
+    }
+  }
 }

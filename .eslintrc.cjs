@@ -28,6 +28,7 @@ module.exports = {
     "react-hooks/exhaustive-deps": "warn",
     "react/no-children-prop": ["off"],
     "no-unreachable": ["warn"],
+    "react/prop-types": ["off"],
     complexity: ["warn", 10],
   },
   settings: {

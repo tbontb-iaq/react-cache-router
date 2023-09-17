@@ -1,0 +1,125 @@
+import "./index.css";
+
+import { useRefInit } from "@/lib/hooks/ref-init";
+import { useRerender } from "@/lib/hooks/rerender";
+import * as random from "@/lib/utils/random";
+
+import React, { useCallback, useRef } from "react";
+
+type MButtonProps = React.DetailedHTMLProps<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  HTMLButtonElement
+>;
+
+interface Ripple {
+  x: number;
+  y: number;
+  size: number;
+}
+
+const InitSize = 50;
+
+function MaterialButton(props: MButtonProps) {
+  const isHolding = useRef(false);
+  const buttonContainer = useRef<HTMLButtonElement>(null);
+  const shouldRemove = useRef<string[]>([]);
+  const rippleMap = useRefInit(() => new Map<string, Ripple>());
+  const rerender = useRerender();
+
+  const pointerLeave = useCallback(() => {
+    isHolding.current = false;
+    shouldRemove.current.forEach(
+      (k) =>
+        buttonContainer.current
+          ?.querySelector(`[data-key="${k}"]`)
+          ?.classList.add("end"),
+    );
+  }, []);
+
+  const onAnimationEnd = useCallback<
+    React.AnimationEventHandler<HTMLDivElement>
+  >(
+    (ev) => {
+      const el = ev.currentTarget,
+        key = el.dataset.key,
+        end = el.classList.contains("end");
+      if (!key) return;
+      if (end) {
+        rippleMap.current.delete(key);
+        rerender();
+      } else if (isHolding.current) shouldRemove.current.push(key);
+      else el.classList.add("end");
+    },
+    [rerender, rippleMap],
+  );
+
+  const onPointerLeave = useCallback<
+    React.PointerEventHandler<HTMLButtonElement>
+  >(
+    (ev) => {
+      props.onPointerLeave?.(ev);
+      pointerLeave();
+    },
+    [pointerLeave, props],
+  );
+
+  const onPointerUp = useCallback<React.PointerEventHandler<HTMLButtonElement>>(
+    (ev) => {
+      props.onPointerUp?.(ev);
+      pointerLeave();
+    },
+    [pointerLeave, props],
+  );
+
+  const onPointerDown = useCallback<
+    React.PointerEventHandler<HTMLButtonElement>
+  >(
+    (ev) => {
+      props.onPointerDown?.(ev);
+      isHolding.current = true;
+      if (buttonContainer.current === null) return;
+
+      const { left, top, bottom, right } =
+          buttonContainer.current.getBoundingClientRect(),
+        { clientX, clientY } = ev,
+        wx = clientX < (left + right) / 2 ? right - clientX : clientX - left,
+        wy = clientY < (top + bottom) / 2 ? bottom - clientY : clientY - top;
+
+      rippleMap.current.set(random.str(), {
+        x: clientX - left,
+        y: clientY - top,
+        size: Math.sqrt(wx * wx + wy * wy) / InitSize,
+      });
+
+      rerender();
+    },
+    [props, rerender, rippleMap],
+  );
+
+  const rippleNode = Array.from(rippleMap.current.entries()).map(([k, r]) => (
+    <div
+      key={k}
+      data-key={k}
+      className="ripple"
+      onAnimationEnd={onAnimationEnd}
+      style={{ "--x": r.x, "--y": r.y, "--size": r.size } as never}
+    />
+  ));
+
+  return (
+    <button
+      {...props}
+      ref={buttonContainer}
+      style={{ "--init-size": InitSize, ...props.style } as never}
+      className={`material-button-container ${props.className ?? ""}`}
+      onPointerLeave={onPointerLeave}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+    >
+      <div className="ripple-container" children={rippleNode} />
+      {props.children}
+    </button>
+  );
+}
+
+export { MaterialButton, MaterialButton as MButton };

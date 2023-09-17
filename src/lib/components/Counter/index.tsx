@@ -1,12 +1,14 @@
+import style from "./index.module.css";
+
 import { useState } from "react";
 
 function Counter({ name }: { name?: string }) {
   const [count, setCount] = useState(0);
 
   return (
-    <div>
+    <div className={style.container}>
       <p>
-        {name ?? "unknown"}: {count}
+        Counter {name ?? "unknown"}: {count}
       </p>
       <button onPointerUp={() => setCount((c) => c + 1)}>+1</button>
     </div>
