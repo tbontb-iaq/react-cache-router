@@ -17,7 +17,7 @@ const router = createRouter({
 
 export function App() {
   useEffect(() => {
-    console.log(import.meta.glob("@/pages/**/index.tsx"));
+    console.log(import.meta.glob("@/pages/**/*.*"));
   }, []);
 
   return <RouterProvider router={router} />;

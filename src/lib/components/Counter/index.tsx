@@ -1,3 +1,4 @@
+import { MButton } from "../MaterialButton";
 import style from "./index.module.css";
 
 import { useState } from "react";
@@ -10,7 +11,7 @@ function Counter({ name }: { name?: string }) {
       <p>
         Counter {name ?? "unknown"}: {count}
       </p>
-      <button onPointerUp={() => setCount((c) => c + 1)}>+1</button>
+      <MButton onPointerUp={() => setCount((c) => c + 1)}>+1</MButton>
     </div>
   );
 }
